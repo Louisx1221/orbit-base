@@ -17,18 +17,18 @@ const double JD2000 = 2451545.0; // 2000年1月1日UT12:00儒略日
 
 const double A_EARTH = 149598023; //km
 const double E_EARTH = 0.016708617;
-const double e_long_perh = 102.93734808; //deg
-const double e_per = 0.99997862; //yrs
+const double E_LONG_PERH = 102.93734808; //deg
+const double E_PER = 0.99997862; //yrs
 
-const double R_moon = 1737.5; //km
-const double mu_moon = 4902.801; //km ^ 3 / s ^ 2 per JPL
-const double mass_moon = 7.3483e22; //kg
+const double R_MOON = 1737.5; //km
+const double MU_MOON = 4902.801; //km ^ 3 / s ^ 2 per JPL
+const double MASS_MOON = 7.3483e22; //kg
 
-const double au = 149597870; //km
-const double mu_sun = 1.32712428e11; //km ^ 3 / s ^ 2
+const double AU = 149597870; //km
+const double MU_SUN = 1.32712428e11; //km ^ 3 / s ^ 2
 
-const double a_mars = 1.52367934*au; //km
-const double R_mars = 3397; //km
-const double mu_mars = 4.305e4; //km ^ 3 / s ^ 2
+const double A_MARS = 1.52367934*au; //km
+const double R_MARS = 3397; //km
+const double MU_MARS = 4.305e4; //km ^ 3 / s ^ 2
 
-const double a_venus = 108208601; //km
+const double A_VENUS = 108208601; //km

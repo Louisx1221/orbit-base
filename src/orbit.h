@@ -65,13 +65,4 @@ void Hohmann(double r_init, double r_fin, double * dv);
 //线性J2模型
 void J2long(double oev[], double dt, double oev_t[]);
 
-//lambert轨道机动
-double ** solve_lambert(double r1[], double r2[], double tof, double cw, int multi_revs);
-
-//单脉冲星下点轨迹调整
-double ground_track_adjustment(double oev_0[], double long_1, double lat_1, double gmst0, int flag_ascending_descending);
-
-//j2模型轨道积分
-void orbJ2_rkf78(double x[], double h, double ti, double tf, double *xoutadr, int neq);
-
 #endif
