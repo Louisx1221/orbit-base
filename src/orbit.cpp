@@ -217,9 +217,9 @@ void Eci2Oev(double rv[], double* oev)
 {
 	// Position and velocity magnitude
 	double r[3] = { rv[0], rv[1], rv[2] };
-	double rmag = sqrt(DotProduct(r, r));
+	double rmag = sqrt(Dot(r, r));
 	double v[3] = { rv[3], rv[4], rv[5] };
-	double vmag = sqrt(DotProduct(v, v));
+	double vmag = sqrt(Dot(v, v));
 
 	// position and velocity unit vectors
 	double rhat[3] = { r[0] / rmag, r[1] / rmag, r[2] / rmag, };
@@ -229,7 +229,7 @@ void Eci2Oev(double rv[], double* oev)
 	hv[0] = r[1] * v[2] - r[2] * v[1];
 	hv[1] = r[2] * v[0] - r[0] * v[2];
 	hv[2] = r[0] * v[1] - r[1] * v[0];
-	double hvmag = sqrt(DotProduct(hv, hv));
+	double hvmag = sqrt(Dot(hv, hv));
 	double hhat[3] = { hv[0] / hvmag, hv[1] / hvmag, hv[2] / hvmag };
 
 	// eccentricity vector
@@ -263,10 +263,10 @@ void Eci2Oev(double rv[], double* oev)
 	ghat[1] = const1 * (1 + p * p - q * q);
 	ghat[2] = const1 * 2 * q;
 
-	double h = DotProduct(ecc, ghat);
-	double xk = DotProduct(ecc, fhat);
-	double x1 = DotProduct(r, fhat);
-	double y1 = DotProduct(r, ghat);
+	double h = Dot(ecc, ghat);
+	double xk = Dot(ecc, fhat);
+	double x1 = Dot(r, fhat);
+	double y1 = Dot(r, ghat);
 
 	// orbital eccentricity
 	double eccm = sqrt(h * h + xk * xk);
@@ -275,26 +275,26 @@ void Eci2Oev(double rv[], double* oev)
 	double inc = 2 * atan(sqrt(p * p + q * q));
 
 	// true longitude
-	double xlambdat = fmod(atan2(y1, x1), 2 * PI);
+	double xlambdat = Mod(atan2(y1, x1), 2 * PI);
 	// check for equatorial orbit
-	double raan = fmod(atan2(p, q), 2 * PI);
+	double raan = Mod(atan2(p, q), 2 * PI);
 	if (inc < 0.00000001)
 	{
 		double raan = 0;
 	}
 
 	// check for circular orbit
-	double argper = fmod(fmod(atan2(h, xk), 2 * PI) - raan, 2 * PI);
+	double argper = Mod(Mod(atan2(h, xk), 2 * PI) - raan, 2 * PI);
 	if (eccm < 0.00000001)
 	{
 		double argper = 0;
 	}
 
 	// true anomaly
-	double tanom = fmod(xlambdat - raan - argper, 2 * PI);
+	double tanom = Mod(xlambdat - raan - argper, 2 * PI);
 	if (hhat[2] == -1)
 	{
-		tanom = fmod(xlambdat - raan - argper, 2 * PI);
+		tanom = Mod(xlambdat - raan - argper, 2 * PI);
 	}
 
 	// singular value when hhat(3) == -1
@@ -302,8 +302,8 @@ void Eci2Oev(double rv[], double* oev)
 	{
 		inc = PI;
 		raan = PI;
-		argper = fmod(-fmod(atan2(h, xk), 2 * PI) + raan, 2 * PI);
-		tanom = fmod(xlambdat - raan - argper, 2 * PI);
+		argper = Mod(-Mod(atan2(h, xk), 2 * PI) + raan, 2 * PI);
+		tanom = Mod(xlambdat - raan - argper, 2 * PI);
 	}
 
 	// orbital element vector
@@ -325,7 +325,7 @@ double SolveKepler(double e, double M)
 
 	if (M > TWO_PI)
 	{
-		M = fmod(M, TWO_PI);
+		M = Mod(M, TWO_PI);
 	}
 
 	double x0 = M;
@@ -351,7 +351,7 @@ double SolveKepler(double e, double M)
 		}
 	}
 	double E = x1;
-	double f = fmod(2 * atan(sqrt((1 + e) / (1 - e)) * tan(E / 2)), TWO_PI);
+	double f = Mod(2 * atan(sqrt((1 + e) / (1 - e)) * tan(E / 2)), TWO_PI);
 	return f;
 }
 
@@ -454,7 +454,7 @@ void Ecef2J2k(double jd, double r_ECEF[], double v_ECEF[], double r_J2000[], dou
 
 	// 地球自转旋转矩阵
 	double thast = 67310.54841 + (876600.0 * 3600.0 + 8640184.812866) * T + 0.0093104 * T * T - 6.2e-6 * T * T * T;
-	thast = fmod(thast, 86400.0);
+	thast = Mod(thast, 86400.0);
 	thast = thast / 43200 * PI;
 	double R[3][3] = { {cos(thast), sin(thast), 0.0}, {-sin(thast), cos(thast), 0.0}, {0.0, 0.0, 1.0} };
 
@@ -468,7 +468,7 @@ void Ecef2J2k(double jd, double r_ECEF[], double v_ECEF[], double r_J2000[], dou
 
 	// 速度
 	double omega_earth[3] = { 0.0, 0.0, -OMEGA_EARTH }, add[3] = { 0.0 };
-	CrossProduct(omega_earth, r_J2000, add);
+	Cross(omega_earth, r_J2000, add);
 	M33T31(W_T, v_ECEF, v_J2000);
 	for (int i = 0; i < 3; i++)
 		v_J2000[i] -= add[i];
@@ -502,7 +502,7 @@ void J2k2Ecef(double jd, double r_j2k[], double v_j2k[], double r_ecef[], double
 
 	// 地球自转旋转矩阵
 	double thast = 67310.54841 + (876600.0 * 3600.0 + 8640184.812866) * T + 0.0093104 * T * T - 6.2e-6 * T * T * T;
-	thast = fmod(thast, 86400.0);
+	thast = Mod(thast, 86400.0);
 	thast = thast / 43200 * PI;
 	double R[3][3] = { {cos(thast), sin(thast), 0.0}, {-sin(thast), cos(thast), 0.0}, {0.0, 0.0, 1.0} };
 
@@ -515,7 +515,7 @@ void J2k2Ecef(double jd, double r_j2k[], double v_j2k[], double r_ecef[], double
 
 	// 速度
 	double omega_earth[3] = { 0.0, 0.0, -OMEGA_EARTH }, add[3] = { 0.0 };
-	CrossProduct(omega_earth, r_j2k, add);
+	Cross(omega_earth, r_j2k, add);
 	for (int i = 0; i < 3; i++)
 		add[i] += v_j2k[i];
 	M33T31(W, add, v_ecef);
@@ -572,7 +572,7 @@ void J2long(double oev[], double dt, double oev_t[])
 	M += (n + dot_M) * dt;
 	E = SolveKepler(e, M);
 	f = (2 * atan(sqrt((1 + e) / (1 - e)) * tan(E / 2)));
-	f = fmod(f, TWO_PI);
+	f = Mod(f, TWO_PI);
 
 	for (int i = 0; i < 3; i++)
 		oev_t[i] = oev[i];

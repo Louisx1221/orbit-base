@@ -5,9 +5,10 @@
 #ifndef MATH_PLUS_H_
 #define MATH_PLUS_H_
 
+double Mod(double x, double y);
 double Atan3(double y, double x);
-double DotProduct(double R1[], double R2[], int n = 3);
-void CrossProduct(double a[], double b[], double* axb);
+double Dot(double R1[], double R2[], int n = 3);
+void Cross(double a[], double b[], double* axb);
 void M33T31(double a[][3], double b[], double c[]);
 void M33T33(double a[][3], double b[][3], double c[][3]);
 void MatTrans(double m1[][3], double m2[][3]);

@@ -6,6 +6,12 @@
 #include "constants.h"
 #include "math_plus.h"
 
+double Mod(double x, double y)
+{
+	double k = x / y - floor(x / y);
+	return y * k;
+}
+
 double Atan3(double y, double x)
 {
 	/**
@@ -17,18 +23,18 @@ double Atan3(double y, double x)
 	输出：
 	out：反正切
 	*/
-	double out = fmod(atan2(y, x), TWO_PI);
+	double out = Mod(atan2(y, x), TWO_PI);
 	return out;
 }
 
-double DotProduct(double R1[], double R2[], int n)
+double Dot(double R1[], double R2[], int n)
 {
 	/*
 	功能：向量点积,out=R1.R2
 	输入：
 		向量：double R1[]
 		向量：double R2[]
-		维数：unsigned long n
+		维数：int n
 	输出：返回点积
 	*/
 	double out = 0.0;
@@ -37,7 +43,7 @@ double DotProduct(double R1[], double R2[], int n)
 	return out;
 }
 
-void CrossProduct(double a[], double b[], double *c)
+void Cross(double a[], double b[], double *c)
 {
 	/*
 	功能：向量叉乘
@@ -45,7 +51,7 @@ void CrossProduct(double a[], double b[], double *c)
 	向量：double a[]
 	向量：double a[]
 	输出：
-	叉乘向量：double c=cross(a，b)
+	叉乘向量：double c=Cross(a，b)
 	*/
 	c[0] = a[1] * b[2] - a[2] * b[1];
 	c[1] = a[2] * b[0] - a[0] * b[2];
