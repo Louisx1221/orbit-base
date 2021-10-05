@@ -51,6 +51,7 @@ Orbit::Orbit(double oev_[], double jd_)
 {
 	for (int i = 0; i < 6; i++)
 		oev[i] = oev_[i];
+	jd = jd_;
 	Oev2Coe();
 }
 
@@ -111,9 +112,11 @@ void Orbit::SmaEcc2RaRp()
 void Orbit::MeanMotion()
 {
 	// eccentric anomaly
-	E = atan2(sin(f) * sqrt(1 - e * e), e + cos(f));
+	E = 2 * atan(sqrt((1 - e) / (1 + e)) * tan(f / 2));
+	E = Mod(E, TWO_PI);
 	// mean anomaly
 	M = E - e * sin(E);
+	M = Mod(M, TWO_PI);
 	T = TWO_PI * sqrt(a * a * a / MU);
 	n = sqrt(MU / a / a / a);
 }
@@ -121,13 +124,14 @@ void Orbit::MeanMotion()
 void Orbit::TrueMotion()
 {
 	E = SolveKepler(e, M);
-	f = (2 * atan(sqrt((1 + e) / (1 - e)) * tan(E / 2)));
-	f = fmod(f, TWO_PI);
+	E = Mod(E, TWO_PI);
+	f = 2 * atan(sqrt((1 + e) / (1 - e)) * tan(E / 2));
+	f = Mod(f, TWO_PI);
 }
 
 void Orbit::Eci2Coe()
 {
-	double rv[6] = { r_eci[0], r_eci[1], r_eci[2], v_eci[0], v_eci[1], r_eci[2] };
+	double rv[6] = { r_eci[0], r_eci[1], r_eci[2], v_eci[0], v_eci[1], v_eci[2] };
 	Eci2Oev(rv, oev);
 	Oev2Coe();
 }
@@ -135,7 +139,7 @@ void Orbit::Eci2Coe()
 void Orbit::Coe2Eci()
 {
 	Coe2Oev();
-	double rv[6] = { 0.0 };
+	double rv[6] = {};
 	Oev2Eci(oev, rv);
 	for (int i = 0; i < 3; i++)
 	{
@@ -168,6 +172,32 @@ void Orbit::Eci2Ecef()
 void Orbit::Ecef2Eci()
 {
 	J2k2Ecef(jd, r_ecef, v_ecef, r_eci, v_eci);
+}
+
+void Orbit::OrbProp(double dt)
+{
+	double gamma_2 = -J2 / 2 * (RE / a) * (RE / a);
+	double eta = sqrt(1 - e * e);
+	double a_r = a / r;
+	double a_mean = a + a * gamma_2 * ((3 * cos(i) * cos(i) - 1) * (a_r * a_r * a_r - eta * eta * eta) + 3 * (1 - cos(i) * cos(i)) * (a_r * a_r * a_r) * cos(2 * omega + 2 * f));
+	double C_J2 = 1.5 * J2 * RE * RE * sqrt(MU) / sqrt(pow(a_mean, 7));
+
+	double dot_Omega = -C_J2 / ((1 - e * e) * (1 - e * e)) * cos(i);
+	double dot_omega = -C_J2 / ((1 - e * e) * (1 - e * e)) * (2.5 * sin(i) * sin(i) - 2);
+	double dot_M = -C_J2 / sqrt((1 - e * e) * (1 - e * e) * (1 - e * e)) * (1.5 * sin(i) * sin(i) - 1);
+
+	double n = sqrt(MU / (a_mean * a_mean * a_mean));
+	omega += dot_omega * dt;
+	Omega += dot_Omega * dt;
+	M += (n + dot_M) * dt;
+	M = Mod(M, TWO_PI);
+	E = SolveKepler(e, M);
+	E = Mod(E, TWO_PI);
+	f = 2 * atan(sqrt((1 + e) / (1 - e)) * tan(E / 2));
+	f = Mod(f, TWO_PI);
+
+	Coe2Oev();
+	jd += (dt / 86400.0);
 }
 
 
@@ -544,7 +574,7 @@ void Hohmann(double R_init, double R_fin, double* dv)
 	dv[1] = v_fin - V_trans_b;  //km / s
 }
 
-void J2long(double oev[], double dt, double oev_t[])
+void J2Long(double oev[], double dt, double oev_t[])
 {
 	double a = oev[0];
 	double e = oev[1];
@@ -552,7 +582,7 @@ void J2long(double oev[], double dt, double oev_t[])
 	double Omega = oev[3];
 	double omega = oev[4];
 	double f = oev[5];
-	double E = atan2(sin(f) * sqrt(1 - e * e), e + cos(f));
+	double E = 2 * atan(sqrt((1 - e) / (1 + e)) * tan(f / 2));
 	double M = E - e * sin(E);
 
 	double r_norm = a * (1 - e * e) / (1 + e * cos(f));
@@ -570,8 +600,10 @@ void J2long(double oev[], double dt, double oev_t[])
 	omega += dot_omega * dt;
 	Omega += dot_Omega * dt;
 	M += (n + dot_M) * dt;
+	M = Mod(M, TWO_PI);
 	E = SolveKepler(e, M);
-	f = (2 * atan(sqrt((1 + e) / (1 - e)) * tan(E / 2)));
+	E = Mod(E, TWO_PI);
+	f = 2 * atan(sqrt((1 + e) / (1 - e)) * tan(E / 2));
 	f = Mod(f, TWO_PI);
 
 	for (int i = 0; i < 3; i++)

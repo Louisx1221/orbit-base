@@ -27,7 +27,7 @@ const double MASS_MOON = 7.3483e22; //kg
 const double AU = 149597870; //km
 const double MU_SUN = 1.32712428e11; //km ^ 3 / s ^ 2
 
-const double A_MARS = 1.52367934*au; //km
+const double A_MARS = 1.52367934*AU; //km
 const double R_MARS = 3397; //km
 const double MU_MARS = 4.305e4; //km ^ 3 / s ^ 2
 

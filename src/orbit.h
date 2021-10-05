@@ -26,6 +26,7 @@ public:
 	void Ecef2Geod();
 	void Eci2Ecef();
 	void Ecef2Eci();
+	void OrbProp(double dt);
 
 	double a, e, i, Omega, omega, f, E, M, T, n;
 	double r, v, r_a, r_p;
@@ -39,7 +40,7 @@ public:
 void Oev2Eci(double oev[], double rv[]);
 
 //位置速度转换为轨道六根数
-void Eci2Oev(double rv[], double oev[]);
+void Eci2Oev(double rv[], double *oev);
 
 //大地坐标系经纬高转WGS84坐标系位置
 void Lla2R(double lla[], double r[]);
@@ -63,6 +64,9 @@ double SolveKepler(double e, double M);
 void Hohmann(double r_init, double r_fin, double * dv);
 
 //线性J2模型
-void J2long(double oev[], double dt, double oev_t[]);
+void J2Long(double oev[], double dt, double oev_t[]);
+
+//求解二体模型下的lambert问题
+//void solve_lambert(double rv1[], double rv2[], double tof, double cw, int multi_revs, int flag, double* dv_min);
 
 #endif
