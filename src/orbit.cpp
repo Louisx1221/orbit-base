@@ -310,14 +310,14 @@ void Eci2Oev(double rv[], double* oev)
 	double raan = Mod(atan2(p, q), 2 * PI);
 	if (inc < 0.00000001)
 	{
-		double raan = 0;
+		raan = 0;
 	}
 
 	// check for circular orbit
 	double argper = Mod(Mod(atan2(h, xk), 2 * PI) - raan, 2 * PI);
 	if (eccm < 0.00000001)
 	{
-		double argper = 0;
+		argper = 0;
 	}
 
 	// true anomaly
